@@ -4,31 +4,47 @@ This project evaluates YOLO model performance on videos and saves metrics to a r
 
 ## Setup Instructions
 
-1. **Clone the repository** (if not already done):
-   ```bash
-   git clone <repo-url>
-   cd cardumen_yolo
-   ```
+### 1. Clone the repository (if not already done):
+```bash
+git clone <repo-url>
+cd cardumen_yolo
+```
 
-2. **Create a virtual environment:**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
+### 2. Create a virtual environment
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+#### On **macOS/Linux**:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-4. **Place your video files** in the `videos/` directory (supported: .mp4, .avi, .mov, .mkv).
+#### On **Windows** (Command Prompt):
+```bat
+python -m venv venv
+venv\Scripts\activate
+```
 
-5. **Run the metrics script:**
-   ```bash
-   python metricas.py
-   ```
+#### On **Windows** (PowerShell):
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
 
-6. **Results** will be saved in the `resultados/` directory with a timestamped filename.
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Place your video files in the `videos/` directory
+Supported formats: .mp4, .avi, .mov, .mkv
+
+### 5. Run the metrics script
+```bash
+python metricas.py
+```
+
+### 6. Results
+Results will be saved in the `resultados/` directory with a timestamped filename.
 
 ---
 
