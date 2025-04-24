@@ -4,3 +4,4 @@ lib/
 pyvenv.cfg
 runs/
 share/
+.DS_Store
