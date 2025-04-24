@@ -4,7 +4,7 @@ from ultralytics import YOLO
 model = YOLO("yolo11n.pt")
 
 # Define path to the image file
-source = "http://192.168.0.7:4747/video"
+source = 0
 
 # Run inference on the source
 model.predict(source, imgsz=320, conf=0.2, show=True)

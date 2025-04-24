@@ -3,7 +3,7 @@ import cv2
 
 model = YOLO("yolo11n-pose.pt")  # Modelo de pose
 
-cap = cv2.VideoCapture("http://192.168.0.7:4747/video")  # Cambia por el nombre real del archivo
+cap = cv2.VideoCapture(0)  # Cambia por el nombre real del archivo
 cv2.namedWindow("Pose", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("Pose", 640, 360)
 
