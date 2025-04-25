@@ -71,12 +71,12 @@ with open(output_file, "w") as out_f:
 
         # Write metrics to file
         out_f.write(f"Video: {video_file}\n")
-        out_f.write(f"Uso de CPU: {cpu_usage/psutil.cpu_count():.4f}%\n")
-        out_f.write(f"CPU Time Used: {cpu_time_used:.4f} seconds\n")
-        out_f.write(f"Wall-Clock Time Elapsed: {wall_time_elapsed:.4f} seconds\n")
-        out_f.write(f"Confianza promedio (solo de personas): {confianza_promedio:.4f}\n")
-        out_f.write(f"Tiempo medio de inferencia: {tiempo_inferencia_total/max(total_frames,1):.4f}\n")
-        out_f.write(f"Tiempo medio de procesamiento (preprocesamiento + inferencia + postprocesamiento): {tiempo_procesamiento_total/max(total_frames,1):.4f}\n")
+        out_f.write(f"Uso de CPU (%): {cpu_usage/psutil.cpu_count():.4f}%\n")
+        out_f.write(f"CPU Time Used (s): {cpu_time_used:.4f} seconds\n")
+        out_f.write(f"Wall-Clock Time Elapsed (s): {wall_time_elapsed:.4f} seconds\n")
+        out_f.write(f"Confianza promedio (solo de personas) (%): {confianza_promedio:.4f}\n")
+        out_f.write(f"Tiempo medio de inferencia/frame (ms): {tiempo_inferencia_total/max(total_frames,1):.4f}\n")
+        out_f.write(f"Tiempo medio de procesamiento/frame (ms) (preprocesamiento + inferencia + postprocesamiento): {tiempo_procesamiento_total/max(total_frames,1):.4f}\n")
         out_f.write("-" * 40 + "\n")
 
 print(f"Todos los resultados guardados en {output_file}")
