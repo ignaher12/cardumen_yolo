@@ -14,20 +14,20 @@ cd cardumen_yolo
 
 #### On **macOS/Linux**:
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .
+source bin/activate
 ```
 
 #### On **Windows** (Command Prompt):
 ```bat
-python -m venv venv
-venv\Scripts\activate
+python -m venv .
+Scripts\activate
 ```
 
 #### On **Windows** (PowerShell):
 ```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
+python -m venv .
+.\Scripts\Activate.ps1
 ```
 
 ### 3. Install dependencies
