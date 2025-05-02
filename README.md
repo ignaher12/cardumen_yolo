@@ -31,6 +31,10 @@ python -m venv .
 ```
 
 ### 3. Install dependencies
+Chequear version de CUDA instalada y ver que version de PyTorch corresponde.
+https://pytorch.org/get-started/locally/
+https://www.digitalocean.com/community/tutorials/yolov8-for-gpu-accelerate-object-detection#step-by-step-guide-to-configure-yolov8-for-gpu
+
 ```bash
 pip install -r requirements.txt
 ```
