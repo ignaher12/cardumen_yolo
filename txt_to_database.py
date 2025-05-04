@@ -241,7 +241,7 @@ if __name__ == "__main__":
     # --- Configuration ---
     DEFAULT_RESULTS_PATH = Path("resultados")
     DEFAULT_DB_FILE = "metrics_database.db"
-    DEVICES = ['cuda']
+    DEVICES = ['cpu']
     
     
 

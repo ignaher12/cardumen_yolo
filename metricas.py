@@ -29,7 +29,7 @@ except pynvml.NVMLError as error:
     print(f"Error al inicializar NVML: {error}")
     print("El monitoreo de métricas de GPU no estará disponible.")
 # ----------------------------------------------------
-devices = ['cpu', 'cuda']
+devices = ['cuda']
 
 for device in devices:
     modelos_yolo = ['yolo11n.pt', 'yolo11s.pt', 'yolo11m.pt', 'yolo11l.pt', 'yolo11x.pt']
