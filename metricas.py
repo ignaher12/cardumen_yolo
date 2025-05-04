@@ -16,18 +16,18 @@ RESULTADOS_DIR = BASE_DIR / "resultados"
 RESULTADOS_DIR.mkdir(parents=True, exist_ok=True)
 
 # --- Inicialización de NVML para monitoreo de GPU ---
-# gpu_monitoring_available = False
-# gpu_handle = None
-# try:
-#     pynvml.nvmlInit()
-#     # Asumimos que se usará la GPU 0 por defecto con 'cuda'
-#     # Puedes ajustar el índice si usas una GPU específica diferente
-#     gpu_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
-#     gpu_monitoring_available = True
-#     print("NVML inicializado correctamente. Monitoreo de GPU activado.")
-# except pynvml.NVMLError as error:
-#     print(f"Error al inicializar NVML: {error}")
-#     print("El monitoreo de métricas de GPU no estará disponible.")
+gpu_monitoring_available = False
+gpu_handle = None
+try:
+    pynvml.nvmlInit()
+    # Asumimos que se usará la GPU 0 por defecto con 'cuda'
+    # Puedes ajustar el índice si usas una GPU específica diferente
+    gpu_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+    gpu_monitoring_available = True
+    print("NVML inicializado correctamente. Monitoreo de GPU activado.")
+except pynvml.NVMLError as error:
+    print(f"Error al inicializar NVML: {error}")
+    print("El monitoreo de métricas de GPU no estará disponible.")
 # ----------------------------------------------------
 devices = ['cpu', 'cuda']
 
@@ -60,7 +60,7 @@ for device in devices:
         with open(output_file_path, "w", encoding='utf-8') as out_f:
             out_f.write(f"Modelo YOLO utilizado: {modelo_seleccionado}\n")
             out_f.write(f"Dispositivo: {device}\n")
-            out_f.write(f"Monitoreo de GPU activo: {False}\n")
+            out_f.write(f"Monitoreo de GPU activo: {gpu_monitoring_available}\n")
             out_f.write("=" * 40 + "\n")
 
             for video_path in video_files:
@@ -82,8 +82,8 @@ for device in devices:
                 tiempo_procesamiento_total = 0
 
                 # Variables para métricas de GPU (por video)
-                # gpu_util_samples = []
-                # gpu_mem_used_samples = []
+                gpu_util_samples = []
+                gpu_mem_used_samples = []
 
                 # --- Empezar temporizadores y monitoreo CPU ---
                 start_cpu_time = time.process_time()
@@ -105,7 +105,7 @@ for device in devices:
                                 exist_ok=True, 
                                 device=device)
                 frame_idx = 0
-                # last_gpu_check_time = time.time()
+                last_gpu_check_time = time.time()
 
                 for frame in resultados:
                     frame_idx += 1
@@ -124,18 +124,18 @@ for device in devices:
                             cantidad_detecciones_personas += 1
 
                     # --- Capturar métricas de GPU periódicamente ---
-                    # current_time = time.time()
-                    # if gpu_monitoring_available and (current_time - last_gpu_check_time >= 1.0):
-                    #     try:
-                    #         util_rates = pynvml.nvmlDeviceGetUtilizationRates(gpu_handle)
-                    #         mem_info = pynvml.nvmlDeviceGetMemoryInfo(gpu_handle)
-                    #         gpu_util_samples.append(util_rates.gpu) # % de uso del core de GPU
-                    #         gpu_mem_used_samples.append(mem_info.used) # Memoria usada en Bytes
-                    #         last_gpu_check_time = current_time
-                    #     except pynvml.NVMLError as error:
-                    #         # Podría fallar si la GPU se resetea o algo inusual ocurre
-                    #         print(f"\nAdvertencia: Error al leer métricas de GPU: {error}")
-                    #         gpu_monitoring_available = False # Desactivar monitoreo para este video
+                    current_time = time.time()
+                    if gpu_monitoring_available and (current_time - last_gpu_check_time >= 1.0):
+                        try:
+                            util_rates = pynvml.nvmlDeviceGetUtilizationRates(gpu_handle)
+                            mem_info = pynvml.nvmlDeviceGetMemoryInfo(gpu_handle)
+                            gpu_util_samples.append(util_rates.gpu) # % de uso del core de GPU
+                            gpu_mem_used_samples.append(mem_info.used) # Memoria usada en Bytes
+                            last_gpu_check_time = current_time
+                        except pynvml.NVMLError as error:
+                            # Podría fallar si la GPU se resetea o algo inusual ocurre
+                            print(f"\nAdvertencia: Error al leer métricas de GPU: {error}")
+                            gpu_monitoring_available = False # Desactivar monitoreo para este video
                     # --------------------------------------------------------------------
 
                 print() # Nueva línea después del progreso del video
@@ -151,25 +151,25 @@ for device in devices:
                 wall_time_elapsed = end_wall_time - start_wall_time
 
                 # --- Calcular métricas promedio/max de GPU ---
-                # avg_gpu_util = 0
-                # max_gpu_util = 0
-                # avg_gpu_mem_used_mb = 0
-                # max_gpu_mem_used_mb = 0
-                # total_gpu_mem_mb = 0
+                avg_gpu_util = 0
+                max_gpu_util = 0
+                avg_gpu_mem_used_mb = 0
+                max_gpu_mem_used_mb = 0
+                total_gpu_mem_mb = 0
 
-                # if gpu_monitoring_available and gpu_util_samples:
-                #     avg_gpu_util = sum(gpu_util_samples) / len(gpu_util_samples)
-                #     max_gpu_util = max(gpu_util_samples)
-                # if gpu_monitoring_available and gpu_mem_used_samples:
-                #     avg_gpu_mem_used_bytes = sum(gpu_mem_used_samples) / len(gpu_mem_used_samples)
-                #     max_gpu_mem_used_bytes = max(gpu_mem_used_samples)
-                #     avg_gpu_mem_used_mb = avg_gpu_mem_used_bytes / (1024**2)
-                #     max_gpu_mem_used_mb = max_gpu_mem_used_bytes / (1024**2)
-                #     try:
-                #         mem_info = pynvml.nvmlDeviceGetMemoryInfo(gpu_handle)
-                #         total_gpu_mem_mb = mem_info.total / (1024**2)
-                #     except pynvml.NVMLError as error:
-                #         print(f"\nAdvertencia: Error al leer memoria total de GPU: {error}")
+                if gpu_monitoring_available and gpu_util_samples:
+                    avg_gpu_util = sum(gpu_util_samples) / len(gpu_util_samples)
+                    max_gpu_util = max(gpu_util_samples)
+                if gpu_monitoring_available and gpu_mem_used_samples:
+                    avg_gpu_mem_used_bytes = sum(gpu_mem_used_samples) / len(gpu_mem_used_samples)
+                    max_gpu_mem_used_bytes = max(gpu_mem_used_samples)
+                    avg_gpu_mem_used_mb = avg_gpu_mem_used_bytes / (1024**2)
+                    max_gpu_mem_used_mb = max_gpu_mem_used_bytes / (1024**2)
+                    try:
+                        mem_info = pynvml.nvmlDeviceGetMemoryInfo(gpu_handle)
+                        total_gpu_mem_mb = mem_info.total / (1024**2)
+                    except pynvml.NVMLError as error:
+                        print(f"\nAdvertencia: Error al leer memoria total de GPU: {error}")
 
                 # -------------------------------------------
 
@@ -189,17 +189,17 @@ for device in devices:
                 # Mostrar ambos puede ser útil. % total del sistema es más complejo de calcular correctamente.
                 out_f.write(f"Uso de CPU del proceso (relativo a 1 core) (%): {cpu_usage_percent:.2f}%\n")
                 out_f.write(f"Uso de CPU normalizado sistema (%): {cpu_usage_percent / psutil.cpu_count():.2f}%\n") # Opcional
-                # if gpu_monitoring_available:
-                #     out_f.write(f"Uso promedio de GPU (%): {avg_gpu_util:.2f}%\n")
-                #     out_f.write(f"Uso máximo de GPU (%): {max_gpu_util:.2f}%\n")
-                #     out_f.write(f"Uso promedio de Memoria GPU (MB): {avg_gpu_mem_used_mb:.2f} MB\n")
-                #     out_f.write(f"Uso máximo de Memoria GPU (MB): {max_gpu_mem_used_mb:.2f} MB\n")
-                #     if total_gpu_mem_mb > 0:
-                #         out_f.write(f"Memoria GPU Total (MB): {total_gpu_mem_mb:.2f} MB\n")
-                #         out_f.write(f"Uso máximo de Memoria GPU (% del total): { (max_gpu_mem_used_mb / total_gpu_mem_mb * 100) if total_gpu_mem_mb else 0 :.2f}%\n")
-                # else:
-                #     out_f.write("Uso de GPU: No disponible\n")
-                #     out_f.write("Uso de Memoria GPU: No disponible\n")
+                if gpu_monitoring_available:
+                    out_f.write(f"Uso promedio de GPU (%): {avg_gpu_util:.2f}%\n")
+                    out_f.write(f"Uso máximo de GPU (%): {max_gpu_util:.2f}%\n")
+                    out_f.write(f"Uso promedio de Memoria GPU (MB): {avg_gpu_mem_used_mb:.2f} MB\n")
+                    out_f.write(f"Uso máximo de Memoria GPU (MB): {max_gpu_mem_used_mb:.2f} MB\n")
+                    if total_gpu_mem_mb > 0:
+                        out_f.write(f"Memoria GPU Total (MB): {total_gpu_mem_mb:.2f} MB\n")
+                        out_f.write(f"Uso máximo de Memoria GPU (% del total): { (max_gpu_mem_used_mb / total_gpu_mem_mb * 100) if total_gpu_mem_mb else 0 :.2f}%\n")
+                else:
+                    out_f.write("Uso de GPU: No disponible\n")
+                    out_f.write("Uso de Memoria GPU: No disponible\n")
                 out_f.write("-" * 10 + " Métricas YOLO " + "-" * 10 + "\n")
                 out_f.write(f"Confianza promedio (solo de personas): {confianza_promedio:.4f}\n")
                 out_f.write(f"Cantidad detecciones (personas): {cantidad_detecciones_personas}\n")
@@ -213,10 +213,10 @@ for device in devices:
         print(f"\nTodos los resultados guardados en {output_file_path}")
 
 # --- Limpieza de NVML ---
-# if gpu_monitoring_available:
-#     try:
-#         pynvml.nvmlShutdown()
-#         print("NVML apagado correctamente.")
-#     except pynvml.NVMLError as error:
-#         print(f"Error al apagar NVML: {error}")
+if gpu_monitoring_available:
+    try:
+        pynvml.nvmlShutdown()
+        print("NVML apagado correctamente.")
+    except pynvml.NVMLError as error:
+        print(f"Error al apagar NVML: {error}")
 # ------------------------
